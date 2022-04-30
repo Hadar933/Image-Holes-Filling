@@ -88,7 +88,7 @@ def fill_hole(I: np.ndarray,
     B_index = tuple(B.T)
     I[H_index] = (w_matrix.dot(I[B_index])) / (w_matrix.dot(np.ones(B.shape[0])))
     return I
-    # a non vectorized verision which is about 3 times slower may look something like this:
+    # a non vectorized version which is about 3 times slower may look something like this:
     # for u in H:
     #     I[u[0], u[1]] = sum([w(u, v) * I[v[0], v[1]] for v in B]) / sum([w(u, v) for v in B])
 

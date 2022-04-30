@@ -25,8 +25,8 @@ def check_connect(c):
 
 
 def check_alg(alg: str):
-    if alg not in ['original', 'bonus1', 'bonus2']:
-        raise argparse.ArgumentTypeError('The algorithm must either the original, or one of the bonuses.')
+    if alg not in ['original', 'bonus1']:
+        raise argparse.ArgumentTypeError('The algorithm must either the original, or the first bonus.')
     return alg
 
 
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     parser.add_argument('connectivity', metavar='connectivity', type=check_connect, nargs="?", const=4, default=4,
                         help=f'Either 4 or 8 (default=4).')
     parser.add_argument('alg', metavar='algorithm', type=check_alg, nargs="?", const='original', default='original',
-                        help=f'Either original, bonus1 or bonus2 (default=original).')
+                        help=f'Either original, or bonus1 (default=original).')
 
     args = parser.parse_args()
     im_pth, msk_pth = args.image_file_path, args.hole_file_path
@@ -69,10 +69,6 @@ if __name__ == '__main__':
         l = 10  # can tune this
         print("Filling hole O(n) method...")
         I = fill_hole2(im, hole, boundary, z, eps, l, None)
-
-    elif alg == 'bonus2':
-        print("Filling hole O(nlogn) method...")
-        # I = fill_hole3(im, hole, boundary, z, eps, None)
 
     print("Saving result as merged.jpg...")
     plt.imshow(I, cmap='gray')
