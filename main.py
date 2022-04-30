@@ -61,7 +61,11 @@ if __name__ == '__main__':
     print("Finding hole+boundary...")
     boundary, hole = find_hole_and_boundary(im, conn)
 
-    if alg == 'bonus1':
+    if alg == 'original':
+        print("Filling hole regular method...")
+        I = fill_hole(im, hole, boundary, z, eps, None)
+
+    elif alg == 'bonus1':
         l = 10  # can tune this
         print("Filling hole O(n) method...")
         I = fill_hole2(im, hole, boundary, z, eps, l, None)
@@ -70,14 +74,7 @@ if __name__ == '__main__':
         print("Filling hole O(nlogn) method...")
         # I = fill_hole3(im, hole, boundary, z, eps, None)
 
-    elif alg == 'original':
-        print("Filling hole regular method...")
-        I = fill_hole(im, hole, boundary, z, eps, None)
-
-    plt.imshow(I, cmap='gray')
-    plt.title("orig")
-    plt.show()
-
     print("Saving result as merged.jpg...")
     plt.imshow(I, cmap='gray')
+    plt.title(f'Restored image, using {alg} algorithm.')
     plt.savefig("merged.jpg")
