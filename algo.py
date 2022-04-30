@@ -104,9 +104,9 @@ def fill_hole2(I: np.ndarray,
     H_index_splitted = np.array_split(H, l)
     for indexes in H_index_splitted:
         center = np.average(indexes, axis=0).astype(np.int)
-        w_vector = cdist(indexes, B)
+        w_vector = cdist(center[np.newaxis, ...], B, metric=w)
         B_index, H_index = tuple(B.T), tuple(indexes.T)
         I[H_index] = (w_vector.dot(I[B_index])) // w_vector.dot(np.ones(B.shape[0]))
-        # same as :
+        # same as the semi non vectorized list comprehension:
         # I[H_index] = sum([w(center, v) * I[v[0], v[1]] for v in B]) / sum([w(center, v) for v in B])
     return I
