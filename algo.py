@@ -53,7 +53,7 @@ def find_hole_and_boundary(I: np.ndarray,
     find the hole H and its boundary B in image I.
     :param connectivity: either 4 or 8
     :param I: the input grayscale image
-    :return: Border (B) ,Hole (H)
+    :return: Border (B: np.ndarray) ,Hole (H:np.ndarray)
     """
     height, width = I.shape[0], I.shape[1]
     H = np.argwhere(I == -1)
@@ -82,7 +82,7 @@ def fill_hole(I: np.ndarray,
     :return: image with filled hole
     """
     if not w: w = lambda u, v: 1 / (eps + np.linalg.norm(u - v) ** z)
-    # cdist is a vectorized, slightly faster version of np.array([w(h, b) for h in H for b in B])
+    # c-dist is a vectorized, faster, version of np.array([w(h, b) for h in H for b in B])
     w_matrix = cdist(H, B, metric=w)
     H_index = tuple(H.T)
     B_index = tuple(B.T)
@@ -92,24 +92,21 @@ def fill_hole(I: np.ndarray,
     # for u in H:
     #     I[u[0], u[1]] = sum([w(u, v) * I[v[0], v[1]] for v in B]) / sum([w(u, v) for v in B])
 
-#
-# # %%
-# im = generate_image_with_hole('monkey.jpg')
-# # %%
-# boundary, hole = find_hole_and_boundary(im, 8)
-# # %%
-# plt.imshow(im, cmap='gray')
-# B_tup = tuple(boundary.T)
-# H_tup = tuple(hole.T)
-# plt.scatter(x=H_tup[1], y=H_tup[0], c='blue', s=1)
-# plt.scatter(x=B_tup[1], y=B_tup[0], c="red", s=1)
-# plt.show()
-# # %%
-# import time
-#
-# start = time.time()
-# I1 = fill_hole(im, hole, boundary, 2, 0.01, None)
-# end = time.time()
-# plt.imshow(I1, cmap='gray')
-# plt.title(f"alg 1 - vectorized, took {end - start}")
-# plt.show()
+
+def fill_hole2(I: np.ndarray,
+               H: np.ndarray,
+               B: np.ndarray,
+               z: float,
+               eps: float,
+               l: int,
+               w: [Callable[[np.ndarray, np.ndarray], float]]):
+    if not w: w = lambda u, v: 1 / (eps + np.linalg.norm(u - v) ** z)
+    H_index_splitted = np.array_split(H, l)
+    for indexes in H_index_splitted:
+        center = np.average(indexes, axis=0).astype(np.int)
+        w_vector = cdist(indexes, B)
+        B_index, H_index = tuple(B.T), tuple(indexes.T)
+        I[H_index] = (w_vector.dot(I[B_index])) // w_vector.dot(np.ones(B.shape[0]))
+        # same as :
+        # I[H_index] = sum([w(center, v) * I[v[0], v[1]] for v in B]) / sum([w(center, v) for v in B])
+    return I

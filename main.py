@@ -1,8 +1,7 @@
 import argparse
 from os.path import exists
-from algo import generate_image_with_hole, find_hole_and_boundary, fill_hole
+from algo import generate_image_with_hole, find_hole_and_boundary, fill_hole, fill_hole2
 from matplotlib import pyplot as plt
-from PIL import Image
 
 
 def check_file_path(filepath: str):
@@ -60,9 +59,19 @@ if __name__ == '__main__':
     # plt.scatter(x=B_tup[1], y=B_tup[0], c="red", s=1)
     # plt.show()
 
-    print("Filling hole...")
-    I1 = fill_hole(im, hole, boundary, z, eps, None)
+    print("Filling hole O(n) method...")
+    for l in [1,5,10,100]:
+        I2 = fill_hole2(im, hole, boundary, z, eps, l, None)
+        plt.imshow(I2, cmap='gray')
+        plt.title(f"O(n) method, l={l}")
+        plt.show()
 
-    print("Saving result as merged.jpg...")
+    print("Filling hole regular method...")
+    I1 = fill_hole(im, hole, boundary, z, eps, None)
     plt.imshow(I1, cmap='gray')
-    plt.savefig("merged.jpg")
+    plt.title("orig")
+    plt.show()
+
+    # print("Saving result as merged.jpg...")
+    # plt.imshow(I1, cmap='gray')
+    # plt.savefig("merged.jpg")
