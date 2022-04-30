@@ -14,7 +14,7 @@ positional arguments:
   z             Power term for the distance metric (default=2).
   eps           Small float value used to avoid division by zero (default=0.01).
   connectivity  Either 4 or 8 (default=4).
-  algorithm     Either original, bonus1 or bonus2 (default=original).
+  algorithm     Either original, or bonus1 (default=original).
 
 optional arguments:
   -h, --help    show this help message and exit
