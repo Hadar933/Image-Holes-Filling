@@ -24,6 +24,12 @@ def check_connect(c):
     return c
 
 
+def check_alg(alg: str):
+    if alg not in ['original', 'bonus1', 'bonus2']:
+        raise argparse.ArgumentTypeError('The algorithm must either the original, or one of the bonuses.')
+    return alg
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Given an original image and a hole image, merges the two and fills the hole.'
@@ -42,36 +48,36 @@ if __name__ == '__main__':
                         help=f'Small float value used to avoid division by zero (default=0.01).')
     parser.add_argument('connectivity', metavar='connectivity', type=check_connect, nargs="?", const=4, default=4,
                         help=f'Either 4 or 8 (default=4).')
+    parser.add_argument('alg', metavar='algorithm', type=check_alg, nargs="?", const='original', default='original',
+                        help=f'Either original, bonus1 or bonus2 (default=original).')
 
     args = parser.parse_args()
-    im_pth, msk_pth, z, eps, conn = args.image_file_path, args.hole_file_path, args.z, args.epsilon, args.connectivity
-
+    im_pth, msk_pth = args.image_file_path, args.hole_file_path
+    z, eps, conn = args.z, args.epsilon, args.connectivity
+    alg = args.alg
     print("Merging image+mask...")
     im = generate_image_with_hole(im_pth, msk_pth)
 
     print("Finding hole+boundary...")
     boundary, hole = find_hole_and_boundary(im, conn)
 
-    # plt.imshow(im, cmap='gray')
-    # B_tup = tuple(boundary.T)
-    # H_tup = tuple(hole.T)
-    # plt.scatter(x=H_tup[1], y=H_tup[0], c='blue', s=1)
-    # plt.scatter(x=B_tup[1], y=B_tup[0], c="red", s=1)
-    # plt.show()
+    if alg == 'bonus1':
+        l = 10  # can tune this
+        print("Filling hole O(n) method...")
+        I = fill_hole2(im, hole, boundary, z, eps, l, None)
 
-    print("Filling hole O(n) method...")
-    for l in [1,5,10,100]:
-        I2 = fill_hole2(im, hole, boundary, z, eps, l, None)
-        plt.imshow(I2, cmap='gray')
-        plt.title(f"O(n) method, l={l}")
-        plt.show()
+    elif alg == 'bonus2':
+        print("Filling hole O(nlogn) method...")
+        # I = fill_hole3(im, hole, boundary, z, eps, None)
 
-    print("Filling hole regular method...")
-    I1 = fill_hole(im, hole, boundary, z, eps, None)
-    plt.imshow(I1, cmap='gray')
+    elif alg == 'original':
+        print("Filling hole regular method...")
+        I = fill_hole(im, hole, boundary, z, eps, None)
+
+    plt.imshow(I, cmap='gray')
     plt.title("orig")
     plt.show()
 
-    # print("Saving result as merged.jpg...")
-    # plt.imshow(I1, cmap='gray')
-    # plt.savefig("merged.jpg")
+    print("Saving result as merged.jpg...")
+    plt.imshow(I, cmap='gray')
+    plt.savefig("merged.jpg")

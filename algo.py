@@ -100,6 +100,17 @@ def fill_hole2(I: np.ndarray,
                eps: float,
                l: int,
                w: [Callable[[np.ndarray, np.ndarray], float]]):
+    """
+        this function implements a suggested O(n) approximation to fill_hole
+    :param l: partitions H to l parts
+    :param eps: tuning parameter to avoid zero division
+    :param z: tuning parameter used as power
+    :param B: the border indexes
+    :param H: the hole indexes
+    :param I: given image
+    :param w: weight function
+    :return: image with filled hole
+    """
     if not w: w = lambda u, v: 1 / (eps + np.linalg.norm(u - v) ** z)
     H_index_splitted = np.array_split(H, l)
     for indexes in H_index_splitted:
