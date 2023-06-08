@@ -1,5 +1,4 @@
-# Lightricks Project
- 
+# Image Hole Filling Project
 ## Usage
 run `py main.py` for default behavior. running `py main.py -h` will trigger the following
 ```
